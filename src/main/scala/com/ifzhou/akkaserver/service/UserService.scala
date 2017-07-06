@@ -18,16 +18,9 @@ import scala.concurrent.Await
 @Service
 class UserService {
 
-  @Autowired var processManagers: ActorRef = _
-
-  implicit val timeout = Timeout(60, TimeUnit.SECONDS)
-
   val logger = LoggerFactory.getLogger(getClass)
 
-  def send(x: String) = {
-    logger.info("{}", x);
-    val result = Await.result(ask(processManagers, x).mapTo[TextMessage], timeout.duration)
-    val resultMap = scala.collection.immutable.Map("value" -> result.msg)
-    resultMap
+  def toUpper(x: String) : String= {
+    return x.toUpperCase
   }
 }

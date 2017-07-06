@@ -1,31 +1,38 @@
 package com.ifzhou.akkaserver.controller;
 
-import com.ifzhou.akkaserver.service.UserService;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
+import com.ifzhou.akkaserver.ob.Message.TextMessage;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+
+import akka.actor.ActorSelection;
+import akka.pattern.Patterns;
+import akka.util.Timeout;
+import org.springframework.web.bind.annotation.RestController;
+import scala.concurrent.Await;
+import scala.concurrent.Future;
+import scala.concurrent.duration.Duration;
 
 /**
  * Created by zhouyifu on 2017/7/6.
  */
-@Controller
+@RestController
+@RequestMapping(value={"/users"})
 public class UserController {
 
     @Autowired
-    UserService userService;
+    private ActorSelection worker;
 
-    @RequestMapping("/test")
-    @ResponseBody
-    public String handle(){
-        return "ddd";
-    }
+    @SuppressWarnings({"rawtypes","unchecked"})
+    @RequestMapping(value={"/find"})
+    public String find(String id) throws Exception {
 
-
-    @RequestMapping("/test1")
-    @ResponseBody
-    public String test1(){
-        Object result=userService.send("hahaha");
-        return "ddd";
+        String uuid = UUID.randomUUID().toString();
+        Future future = Patterns.ask(worker, uuid, Timeout.apply(10L, TimeUnit.SECONDS));
+        TextMessage o = (TextMessage)Await.result(future,Duration.create(10L,TimeUnit.SECONDS));
+        return o.msg();
     }
 }

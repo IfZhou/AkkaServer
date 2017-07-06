@@ -17,15 +17,9 @@ class ProcessManagers extends Actor {
 
   val logger = LoggerFactory.getLogger(getClass)
 
-  val worker = context.actorOf(Props[Worker].withDispatcher("my-thread-pool-dispatcher").withRouter(RandomPool(4)), "worker")
-
-  implicit val timeout = Timeout(60, TimeUnit.SECONDS)
+  val worker = context.actorOf(Props[Worker].withDispatcher("my-thread-pool-dispatcher"), "worker")
 
   def receive = {
-    case x: String =>
-      logger.info("{}", x);
-      sender ! Await.result(ask(worker, x), timeout.duration)
-    case x: Int =>
-      logger.info("{}", x)
+    case x: Any =>
   }
 }

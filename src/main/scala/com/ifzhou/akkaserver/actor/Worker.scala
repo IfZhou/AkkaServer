@@ -5,8 +5,8 @@ package com.ifzhou.akkaserver.actor
   */
 import akka.actor.Actor
 import com.ifzhou.akkaserver.config.BeanFactory
-import com.ifzhou.akkaserver.controller.UserController
-import com.ifzhou.akkaserver.ob.Message
+import com.ifzhou.akkaserver.ob.Message.TextMessage
+import com.ifzhou.akkaserver.service.UserService
 import org.slf4j.LoggerFactory
 
 
@@ -14,12 +14,13 @@ class Worker extends Actor {
 
   val logger = LoggerFactory.getLogger(getClass)
 
-  lazy val demainService = BeanFactory.buildFactory().getBean(classOf[UserController])
+  lazy val domainService = BeanFactory.buildFactory().getBean(classOf[UserService])
 
   def receive = {
     case x: String => {
-      logger.info("{}", x);
-      sender ! new Message.TextMessage(demainService.handle)
+      logger.info("x:{}", x)
+      val textMsg = new TextMessage(domainService.toUpper(x))
+      sender ! textMsg
     }
   }
 }

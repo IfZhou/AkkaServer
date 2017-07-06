@@ -14,10 +14,17 @@ class AkkaConfig {
 
   val system = ActorSystem("ReactiveEnterprise")
 
-  val processManagersRef = system.actorOf(Props[ProcessManagers].withDispatcher("my-thread-pool-dispatcher").withRouter(RandomPool(2)),"processManagers")
+  val processManagersRef = system.actorOf(Props[ProcessManagers].withDispatcher("my-thread-pool-dispatcher"), "processManagers")
 
   @Bean
   def processManagers = {
     processManagersRef
+  }
+
+  @Bean
+  def worker = {
+    system.actorSelection("/user/processManagers/worker")
+//    system.actorSelection("../actor/Worker")
+
   }
 }
